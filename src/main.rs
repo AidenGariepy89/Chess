@@ -1,3 +1,11 @@
+use chess::chess;
+use ::chess::chess::utils::LoopState;
+
 fn main() {
-    println!("Hello, world!");
+    let mut result = LoopState::Continue;
+
+    while let LoopState::Continue = result {
+        result = chess::run();
+    }
 }
+
