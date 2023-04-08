@@ -1,3 +1,7 @@
+// Type Definitions
+
+use colored::*;
+
 #[derive(Clone, Copy)]
 pub enum Piece {
     None,
@@ -30,3 +34,46 @@ pub enum LoopState {
     Continue,
     Exit,
 }
+
+// Type Implementations
+
+impl Piece {
+    pub fn to_colored_string(&self) -> ColoredString {
+        match self {
+            Piece::None => " ".normal(),
+            Piece::Piece(p) => p.to_colored_string(),
+        }
+    }
+}
+
+impl PlayerPiece {
+    pub fn new(piece: PieceType, player: Player) -> Self {
+        Self { piece, player }
+    }
+
+    pub fn to_colored_string(&self) -> ColoredString {
+        match self.player {
+            Player::White => {
+                match self.piece {
+                    PieceType::Pawn => "P".bold(),
+                    PieceType::Rook => "R".bold(),
+                    PieceType::Knight => "N".bold(),
+                    PieceType::Bishop => "B".bold(),
+                    PieceType::Queen => "Q".bold(),
+                    PieceType::King => "K".bold(),
+                }
+            },
+            Player::Black => {
+                match self.piece {
+                    PieceType::Pawn => "P".green().bold(),
+                    PieceType::Rook => "R".green().bold(),
+                    PieceType::Knight => "N".green().bold(),
+                    PieceType::Bishop => "B".green().bold(),
+                    PieceType::Queen => "Q".green().bold(),
+                    PieceType::King => "K".green().bold(),
+                }
+            },
+        }
+    }
+}
+

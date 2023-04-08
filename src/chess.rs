@@ -2,13 +2,12 @@ mod board;
 pub mod utils;
 
 use self::utils::LoopState;
-
 use self::board::Board;
 
 pub fn run() -> LoopState {
-    let board = Board::new();
+    let mut board = Board::new();
 
-    board.test();
+    board.print();
 
     return LoopState::Exit;
 }
