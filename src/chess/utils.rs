@@ -30,9 +30,9 @@ pub struct PlayerPiece {
     player: Player,
 }
 
-pub enum LoopState {
-    Continue,
-    Exit,
+pub struct Move {
+    pub from: usize,
+    pub to: usize,
 }
 
 // Type Implementations

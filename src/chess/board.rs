@@ -1,9 +1,8 @@
 use anyhow::{Result, anyhow};
-use colored::*;
-use super::utils::{Piece, Player, PieceType, PlayerPiece};
+use super::utils::{Piece, Player, PieceType, PlayerPiece, Move};
 
-const ROW_LEN: usize = 8;
-const BOARD_LEN: usize = 64;
+pub const ROW_LEN: usize = 8;
+pub const BOARD_LEN: usize = 64;
 
 pub struct Board {
     spaces: [Piece; BOARD_LEN],
@@ -58,18 +57,24 @@ impl Board {
         }
     }
 
-    pub fn place_no_rules(&mut self, piece: PieceType, index: usize) -> Result<()> {
-        if index >= BOARD_LEN { return Err(anyhow!("Index out of range!")); }
-
-        match self.spaces[index] {
-            Piece::None => {
-                self.spaces[index] = Piece::Piece(PlayerPiece::new(piece, self.turn));
+    pub fn move_no_rules(&mut self, m: Move) -> Result<()> {
+        match self.spaces[m.from] {
+            Piece::None => { return Err(anyhow!("No piece there!")); },
+            Piece::Piece(p) => {
+                self.spaces[m.from] = Piece::None;
+                match self.spaces[m.to] {
+                    Piece::None => {
+                        self.spaces[m.to] = Piece::Piece(p);
+                    },
+                    Piece::Piece(_) => { return Err(anyhow!("A piece is already there!")); },
+                }
             },
-            Piece::Piece(_) => { return Err(anyhow!("Piece already there!")); }
         }
 
         return Ok(());
     }
+
+    pub fn get_turn(&self) -> Player { self.turn }
 
     pub fn next_turn(&mut self) {
         match self.turn {
@@ -89,12 +94,19 @@ impl Board {
             for i in 0..3 {
                 for col in 0..ROW_LEN {
                     if i == 0 { print!("|     "); }
-                    if i == 1 { print!("|  {}  ", self.spaces[(row * 8) + col].to_colored_string()); }
+                    if i == 1 {
+                        if col == 0 {
+                            print!("{}  {}  ", 8 - row, self.spaces[(row * 8) + col].to_colored_string());
+                        } else {
+                            print!("|  {}  ", self.spaces[(row * 8) + col].to_colored_string());
+                        }
+                    }
                     if i == 2 { print!("|_____"); }
                 }
                 println!("|");
             }
         }
+        println!("   a     b     c     d     e     f     g     h");
     }
 }
 
