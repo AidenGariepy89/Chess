@@ -38,16 +38,15 @@ pub fn run(board: &mut Board) -> LoopState {
             return LoopState::Continue;
         },
         Ok(m) => {
-            if m.is_valid_move(&board) {
-                board.move_no_rules(m).unwrap();
-            } else {
-                println!("Invalid move!");
+            //board.play_no_rules(m).unwrap();
+            if let Err(error) = board.play(m) {
+                println!("{}", error);
 
                 #[allow(unused_variables)]
                 let input = get_input();
 
                 return LoopState::Continue;
-            }
+            };
         }
     }
 

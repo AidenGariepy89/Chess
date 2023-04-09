@@ -30,6 +30,7 @@ pub struct PlayerPiece {
     pub player: Player,
 }
 
+#[derive(Clone, Copy)]
 pub struct Move {
     pub from: usize,
     pub to: usize,

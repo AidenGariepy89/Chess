@@ -57,7 +57,22 @@ impl Board {
         }
     }
 
-    pub fn move_no_rules(&mut self, m: Move) -> Result<()> {
+    pub fn play(&mut self, m: Move) -> Result<()> {
+        let result = m.is_valid_move(&self);
+
+        if result {
+            let piece = self.spaces[m.from];
+
+            self.spaces[m.from] = Piece::None;
+            self.spaces[m.to] = piece;
+
+            return Ok(());
+        } else {
+            return Err(anyhow!("Invalid move!"));
+        }
+    }
+
+    pub fn play_no_rules(&mut self, m: Move) -> Result<()> {
         match self.spaces[m.from] {
             Piece::None => { return Err(anyhow!("No piece there!")); },
             Piece::Piece(p) => {
