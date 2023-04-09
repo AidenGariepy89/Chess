@@ -74,6 +74,11 @@ impl Board {
         return Ok(());
     }
 
+    pub fn get_space(&self, index: usize) -> Option<Piece> {
+        if index >= BOARD_LEN { return None; }
+        return Some(self.spaces[index]);
+    }
+
     pub fn get_turn(&self) -> Player { self.turn }
 
     pub fn next_turn(&mut self) {
@@ -106,10 +111,9 @@ impl Board {
                 println!("|");
             }
         }
-        println!("   a     b     c     d     e     f     g     h");
+        println!("   a     b     c     d     e     f     g     h\n");
     }
 }
-
 
 // _____ _____ _____ _____ _____ _____ _____ _____
 //|     |     |     |     |     |     |     |     |
@@ -136,11 +140,3 @@ impl Board {
 //|     |     |     |     |     |     |     |     |
 //|  R  |  N  |  B  |  K  |  Q  |  B  |  N  |  R  |
 //|_____|_____|_____|_____|_____|_____|_____|_____|
-//
-//
-//
-//
-//
-//
-//
-//

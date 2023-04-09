@@ -1,5 +1,6 @@
 pub mod board;
 pub mod utils;
+pub mod movement;
 
 use anyhow::{Result, anyhow};
 use colored::*;
@@ -37,7 +38,16 @@ pub fn run(board: &mut Board) -> LoopState {
             return LoopState::Continue;
         },
         Ok(m) => {
-            board.move_no_rules(m).unwrap();
+            if m.is_valid_move(&board) {
+                board.move_no_rules(m).unwrap();
+            } else {
+                println!("Invalid move!");
+
+                #[allow(unused_variables)]
+                let input = get_input();
+
+                return LoopState::Continue;
+            }
         }
     }
 

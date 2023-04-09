@@ -26,8 +26,8 @@ pub enum Player {
 
 #[derive(Clone, Copy)]
 pub struct PlayerPiece {
-    piece: PieceType,
-    player: Player,
+    pub piece: PieceType,
+    pub player: Player,
 }
 
 pub struct Move {
