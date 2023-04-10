@@ -17,6 +17,10 @@ impl Move {
                     }
                 }
 
+                if std::mem::discriminant(&piece.player) != std::mem::discriminant(&board.get_turn()) {
+                    return Err(anyhow!("That's not your piece!"));
+                }
+
                 match piece.piece {
                     PieceType::Pawn => {
                         return pawn_movement(&board, &self, piece);
