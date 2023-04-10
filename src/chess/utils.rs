@@ -39,9 +39,12 @@ pub struct Move {
 // Type Implementations
 
 impl Piece {
-    pub fn to_colored_string(&self) -> ColoredString {
+    pub fn to_colored_string(&self, is_last_move: bool) -> ColoredString {
         match self {
-            Piece::None => " ".normal(),
+            Piece::None => {
+                if is_last_move { return "#".yellow(); }
+                return " ".normal();
+            }
             Piece::Piece(p) => p.to_colored_string(),
         }
     }

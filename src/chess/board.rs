@@ -7,12 +7,14 @@ pub const BOARD_LEN: usize = 64;
 pub struct Board {
     spaces: [Piece; BOARD_LEN],
     turn: Player,
+    last_move: Option<usize>,
 }
 
 impl Board {
     pub fn new() -> Self {
         Self {
             turn: Player::White,
+            last_move: None,
             spaces: [
                 Piece::Piece(PlayerPiece::new(PieceType::Rook, Player::Black)),
                 Piece::Piece(PlayerPiece::new(PieceType::Knight, Player::Black)),
@@ -65,6 +67,8 @@ impl Board {
         self.spaces[m.from] = Piece::None;
         self.spaces[m.to] = piece;
 
+        self.last_move = Some(m.from);
+
         return Ok(());
     }
 
@@ -111,10 +115,15 @@ impl Board {
                 for col in 0..ROW_LEN {
                     if i == 0 { print!("|     "); }
                     if i == 1 {
+                        let mut is_last_move = false;
+                        if let Some(index) = self.last_move {
+                            if index == (row * 8) + col { is_last_move = true; }
+                        }
+
                         if col == 0 {
-                            print!("{}  {}  ", 8 - row, self.spaces[(row * 8) + col].to_colored_string());
+                            print!("{}  {}  ", 8 - row, self.spaces[(row * 8) + col].to_colored_string(is_last_move));
                         } else {
-                            print!("|  {}  ", self.spaces[(row * 8) + col].to_colored_string());
+                            print!("|  {}  ", self.spaces[(row * 8) + col].to_colored_string(is_last_move));
                         }
                     }
                     if i == 2 { print!("|_____"); }
