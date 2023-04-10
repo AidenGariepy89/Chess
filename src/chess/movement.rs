@@ -74,6 +74,13 @@ fn pawn_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
         Player::Black => {
             if m.to < m.from { return Err(anyhow!("Pawn cannot move backwards!")); }
 
+            if let Piece::Piece(_) = board.get_space(m.to).unwrap() {
+                if m.to == m.from + ROW_LEN + 1 || m.to == m.from + ROW_LEN - 1 {
+                    return Ok(());
+                }
+                return Err(anyhow!("Pawn can only capture diagonally one space ahead!"));
+            }
+
             if m.from >= 8 && m.from < 16 {
                 if m.to - m.from == ROW_LEN || m.to - m.from == ROW_LEN * 2 {
                     return Ok(());
