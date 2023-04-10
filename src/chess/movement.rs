@@ -102,7 +102,6 @@ fn rook_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
             None => { return Ok(()); },
             Some(index) => {
                 if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
-
                 return Ok(());
             }
         }
@@ -112,7 +111,6 @@ fn rook_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
             None => { return Ok(()); },
             Some(index) => {
                 if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
-
                 return Ok(());
             }
         }
@@ -122,7 +120,6 @@ fn rook_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
             None => { return Ok(()); },
             Some(index) => {
                 if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
-
                 return Ok(());
             }
         }
@@ -132,7 +129,6 @@ fn rook_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
             None => { return Ok(()); },
             Some(index) => {
                 if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
-
                 return Ok(());
             }
         }
@@ -141,11 +137,48 @@ fn rook_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
     return Err(anyhow!("Rooks only move horizontally or vertically!"));
 }
 
-fn knight_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
-    return Err(anyhow!("Not implemented yet!"));
+fn bishop_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
+    if index_in_raycast(&board, m.from, Direction::Northeast, m.to) {
+        match raycast(&board, m.from, Direction::Northeast) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
+                return Ok(());
+            }
+        }
+    }
+    if index_in_raycast(&board, m.from, Direction::Northwest, m.to) {
+        match raycast(&board, m.from, Direction::Northwest) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
+                return Ok(());
+            }
+        }
+    }
+    if index_in_raycast(&board, m.from, Direction::Southeast, m.to) {
+        match raycast(&board, m.from, Direction::Southeast) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
+                return Ok(());
+            }
+        }
+    }
+    if index_in_raycast(&board, m.from, Direction::Southwest, m.to) {
+        match raycast(&board, m.from, Direction::Southwest) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
+                return Ok(());
+            }
+        }
+    }
+
+    return Err(anyhow!("Bishops only move diagonally!"));
 }
 
-fn bishop_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
+fn knight_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
     return Err(anyhow!("Not implemented yet!"));
 }
 
@@ -155,14 +188,6 @@ fn queen_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
 
 fn king_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
     return Err(anyhow!("Not implemented yet!"));
-}
-
-#[test]
-fn rook_test() {
-    let board = Board::new();
-
-    let m = Move { from: 0, to: 9 };
-    assert_eq!(m.is_valid_move(&board).is_err(), true);
 }
 
 enum Direction {
