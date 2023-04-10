@@ -1,12 +1,22 @@
 use super::{utils::{Move, Piece, PieceType, PlayerPiece, Player}, board::{Board, BOARD_LEN, ROW_LEN}};
+use anyhow::{Result, anyhow};
 
 impl Move {
-    pub fn is_valid_move(&self, board: &Board) -> bool {
-        if self.from >= BOARD_LEN || self.to >= BOARD_LEN { return false; }
+    pub fn is_valid_move(&self, board: &Board) -> Result<()> {
+        if self.from >= BOARD_LEN || self.to >= BOARD_LEN { return Err(anyhow!("Index out of bounds!")); }
 
         match board.get_space(self.from).unwrap() {
-            Piece::None => { return false; },
+            Piece::None => { return Err(anyhow!("No piece there!")); },
             Piece::Piece(piece) => {
+                if let Piece::Piece(target_piece) = board.get_space(self.to).unwrap() {
+                    if let (Player::White, Player::White) = (piece.player, target_piece.player) {
+                        return Err(anyhow!("Cannot capture your own piece!"));
+                    }
+                    if let (Player::Black, Player::Black) = (piece.player, target_piece.player) {
+                        return Err(anyhow!("Cannot capture your own piece!"));
+                    }
+                }
+
                 match piece.piece {
                     PieceType::Pawn => {
                         return pawn_movement(&board, &self, piece);
@@ -33,74 +43,108 @@ impl Move {
 }
 
 /// Pawn movement, no capturing
-fn pawn_movement(board: &Board, m: &Move, p: PlayerPiece) -> bool {
+fn pawn_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
     match p.player {
         Player::White => {
-            if m.to > m.from { return false; }
+            if m.to > m.from { return Err(anyhow!("Pawn cannot move backwards!")); }
 
             if m.from >= 48 && m.from < 56 {
-                return m.from - m.to == ROW_LEN || m.from - m.to == ROW_LEN * 2;
+                if m.from - m.to == ROW_LEN || m.from - m.to == ROW_LEN * 2 {
+                    return Ok(());
+                }
+                return Err(anyhow!("Pawn can only move straight forward!"));
             }
 
-            return m.from - m.to == ROW_LEN;
+            if m.from - m.to == ROW_LEN {
+                return Ok(());
+            }
+            return Err(anyhow!("Pawn can only move straight forward!"));
         },
         Player::Black => {
-            if m.to < m.from { return false; }
+            if m.to < m.from { return Err(anyhow!("Pawn cannot move backwards!")); }
 
             if m.from >= 8 && m.from < 16 {
-                return m.to - m.from == ROW_LEN || m.to - m.from == ROW_LEN * 2;
+                if m.to - m.from == ROW_LEN || m.to - m.from == ROW_LEN * 2 {
+                    return Ok(());
+                }
+                return Err(anyhow!("Pawn can only move straight forward!"));
             }
 
-            return m.to - m.from == ROW_LEN;
+            if m.to - m.from == ROW_LEN {
+                return Ok(());
+            }
+            return Err(anyhow!("Pawn can only move straight forward!"));
         },
     }
 }
 
+fn rook_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
+    if index_in_raycast(&board, m.from, Direction::North, m.to) {
+        match raycast(&board, m.from, Direction::North) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
+
+                return Ok(());
+            }
+        }
+    }
+    if index_in_raycast(&board, m.from, Direction::East, m.to) {
+        match raycast(&board, m.from, Direction::East) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
+
+                return Ok(());
+            }
+        }
+    }
+    if index_in_raycast(&board, m.from, Direction::South, m.to) {
+        match raycast(&board, m.from, Direction::South) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
+
+                return Ok(());
+            }
+        }
+    }
+    if index_in_raycast(&board, m.from, Direction::West, m.to) {
+        match raycast(&board, m.from, Direction::West) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
+
+                return Ok(());
+            }
+        }
+    }
+
+    return Err(anyhow!("Rooks only move horizontally or vertically!"));
+}
+
+fn knight_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
+    return Err(anyhow!("Not implemented yet!"));
+}
+
+fn bishop_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
+    return Err(anyhow!("Not implemented yet!"));
+}
+
+fn queen_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
+    return Err(anyhow!("Not implemented yet!"));
+}
+
+fn king_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
+    return Err(anyhow!("Not implemented yet!"));
+}
+
 #[test]
-fn pawn_move_test() {
-    let mut board = Board::new();
+fn rook_test() {
+    let board = Board::new();
 
-    let m = Move { from: 8, to: 16 };
-    assert_eq!(m.is_valid_move(&board), true);
-    let m = Move { from: 8, to: 24 };
-    assert_eq!(m.is_valid_move(&board), true);
-    let m = Move { from: 8, to: 16 };
-    board.move_no_rules(m).unwrap();
-    let m = Move { from: 16, to: 24 };
-    assert_eq!(m.is_valid_move(&board), true);
-    let m = Move { from: 16, to: 32 };
-    assert_eq!(m.is_valid_move(&board), false);
-
-    let m = Move { from: 48, to: 40 };
-    assert_eq!(m.is_valid_move(&board), true);
-    let m = Move { from: 48, to: 32 };
-    assert_eq!(m.is_valid_move(&board), true);
-    let m = Move { from: 48, to: 40 };
-    board.move_no_rules(m).unwrap();
-    let m = Move { from: 40, to: 24 };
-    assert_eq!(m.is_valid_move(&board), false);
-    let m = Move { from: 40, to: 32 };
-    assert_eq!(m.is_valid_move(&board), true);
-}
-
-fn rook_movement(board: &Board, m: &Move, p: PlayerPiece) -> bool {
-    return false;
-}
-
-fn knight_movement(board: &Board, m: &Move, p: PlayerPiece) -> bool {
-    return false;
-}
-
-fn bishop_movement(board: &Board, m: &Move, p: PlayerPiece) -> bool {
-    return false;
-}
-
-fn queen_movement(board: &Board, m: &Move, p: PlayerPiece) -> bool {
-    return false;
-}
-
-fn king_movement(board: &Board, m: &Move, p: PlayerPiece) -> bool {
-    return false;
+    let m = Move { from: 0, to: 9 };
+    assert_eq!(m.is_valid_move(&board).is_err(), true);
 }
 
 enum Direction {

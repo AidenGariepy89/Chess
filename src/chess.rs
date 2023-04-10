@@ -38,7 +38,6 @@ pub fn run(board: &mut Board) -> LoopState {
             return LoopState::Continue;
         },
         Ok(m) => {
-            //board.play_no_rules(m).unwrap();
             if let Err(error) = board.play(m) {
                 println!("{}", error);
 
