@@ -183,7 +183,80 @@ fn knight_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
 }
 
 fn queen_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
-    return Err(anyhow!("Not implemented yet!"));
+    if index_in_raycast(&board, m.from, Direction::North, m.to) {
+        match raycast(&board, m.from, Direction::North) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
+                return Ok(());
+            }
+        }
+    }
+    if index_in_raycast(&board, m.from, Direction::East, m.to) {
+        match raycast(&board, m.from, Direction::East) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
+                return Ok(());
+            }
+        }
+    }
+    if index_in_raycast(&board, m.from, Direction::South, m.to) {
+        match raycast(&board, m.from, Direction::South) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
+                return Ok(());
+            }
+        }
+    }
+    if index_in_raycast(&board, m.from, Direction::West, m.to) {
+        match raycast(&board, m.from, Direction::West) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
+                return Ok(());
+            }
+        }
+    }
+    if index_in_raycast(&board, m.from, Direction::Northeast, m.to) {
+        match raycast(&board, m.from, Direction::Northeast) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
+                return Ok(());
+            }
+        }
+    }
+    if index_in_raycast(&board, m.from, Direction::Northwest, m.to) {
+        match raycast(&board, m.from, Direction::Northwest) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
+                return Ok(());
+            }
+        }
+    }
+    if index_in_raycast(&board, m.from, Direction::Southeast, m.to) {
+        match raycast(&board, m.from, Direction::Southeast) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
+                return Ok(());
+            }
+        }
+    }
+    if index_in_raycast(&board, m.from, Direction::Southwest, m.to) {
+        match raycast(&board, m.from, Direction::Southwest) {
+            None => { return Ok(()); },
+            Some(index) => {
+                if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
+                return Ok(());
+            }
+        }
+    }
+
+    return Err(anyhow!("The Queen can only move horizontally, vertically, or diagonally!"));
 }
 
 fn king_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
