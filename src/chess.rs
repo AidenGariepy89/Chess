@@ -1,6 +1,8 @@
 pub mod board;
 pub mod utils;
 pub mod movement;
+pub mod checker;
+pub mod keeper;
 
 use anyhow::{Result, anyhow};
 use colored::*;
