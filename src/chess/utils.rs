@@ -8,7 +8,7 @@ pub enum Piece {
     Piece(PlayerPiece),
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub enum PieceType {
     Pawn,
     Rook,
@@ -56,6 +56,7 @@ impl PlayerPiece {
     }
 
     pub fn to_colored_string(&self, is_moved: bool) -> ColoredString {
+        #[allow(unused_assignments)]
         let mut output = "".normal();
         match self.player {
             Player::White => {
