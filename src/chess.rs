@@ -49,7 +49,7 @@ pub fn run(board: &mut Board) -> LoopState {
         }
     }
 
-    board.next_turn();
+    //board.next_turn();
 
     return LoopState::Continue;
 }

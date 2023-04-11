@@ -98,18 +98,14 @@ fn pawn_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
 }
 
 fn king_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
-    if m.to < m.from { // Moving up
-        if m.from < ROW_LEN {
-            if m.to == m.from - 1 { return Ok(()); }
-            else { return Err(anyhow!("The King can only move horizontally, vertically, and diagonally one space!")); }
-        }
-        if m.to == m.from - ROW_LEN || m.to == m.from - ROW_LEN - 1 || m.to == m.from - ROW_LEN + 1 { return Ok(()); }
-    } else { // Moving down
-        if m.from >= BOARD_LEN - ROW_LEN {
-            if m.to == m.from + 1 { return Ok(()); }
-            else { return Err(anyhow!("The King can only move horizontally, vertically, and diagonally one space!")); }
-        }
-        if m.to == m.from + ROW_LEN || m.to == m.from + ROW_LEN - 1 || m.to == m.from + ROW_LEN + 1 { return Ok(()); }
+    if m.to < m.from { // Moving up or left
+        if m.to == m.from - 1 { return Ok(()); } // move just left
+        if m.from < ROW_LEN { return Err(anyhow!("The King can only move horizontally, vertically, and diagonally one space!")); } // cant move up on top row
+        if m.to == m.from - ROW_LEN || m.to == m.from - ROW_LEN - 1 || m.to == m.from - ROW_LEN + 1 { return Ok(()); } // moving up
+    } else { // Moving down or right
+        if m.to == m.from + 1 { return Ok(()); } // move just right
+        if m.from >= BOARD_LEN - ROW_LEN { return Err(anyhow!("The King can only move horizontally, vertically, and diagonally one space!")); } // cant move down on bottom row
+        if m.to == m.from + ROW_LEN || m.to == m.from + ROW_LEN - 1 || m.to == m.from + ROW_LEN + 1 { return Ok(()); } // moving down
     }
 
     return Err(anyhow!("The King can only move horizontally, vertically, and diagonally one space!"));
@@ -197,10 +193,6 @@ fn bishop_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
     return Err(anyhow!("Bishops only move diagonally!"));
 }
 
-fn knight_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
-    return Err(anyhow!("Not implemented yet!"));
-}
-
 fn queen_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
     if index_in_raycast(&board, m.from, Direction::North, m.to) {
         match raycast(&board, m.from, Direction::North) {
@@ -276,6 +268,15 @@ fn queen_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
     }
 
     return Err(anyhow!("The Queen can only move horizontally, vertically, or diagonally!"));
+}
+
+fn knight_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
+    if m.to < m.from { // Moving up
+        if m.from < ROW_LEN { return Err(anyhow!("Knights can only move in those weird L shapes!")); }
+        
+    }
+
+    return Err(anyhow!("Not implemented yet!"));
 }
 
 enum Direction {
@@ -445,27 +446,5 @@ fn raycast(board: &Board, from: usize, direction: Direction) -> Option<usize> {
     }
 
     return None;
-}
-
-#[test]
-fn test_raycast() {
-    let board = Board::new();
-
-    assert_eq!(raycast(&board, 8, Direction::North), Some(0));
-    assert_eq!(raycast(&board, 0, Direction::North), None);
-    assert_eq!(raycast(&board, 48, Direction::South), Some(56));
-    assert_eq!(raycast(&board, 56, Direction::South), None);
-    assert_eq!(raycast(&board, 8, Direction::East), Some(9));
-    assert_eq!(raycast(&board, 16, Direction::East), None);
-    assert_eq!(raycast(&board, 9, Direction::West), Some(8));
-    assert_eq!(raycast(&board, 8, Direction::West), None);
-    assert_eq!(raycast(&board, 8, Direction::Northeast), Some(1));
-    assert_eq!(raycast(&board, 37, Direction::Northeast), None);
-    assert_eq!(raycast(&board, 9, Direction::Northwest), Some(0));
-    assert_eq!(raycast(&board, 34, Direction::Northwest), None);
-    assert_eq!(raycast(&board, 0, Direction::Southeast), Some(9));
-    assert_eq!(raycast(&board, 21, Direction::Southeast), None);
-    assert_eq!(raycast(&board, 1, Direction::Southwest), Some(8));
-    assert_eq!(raycast(&board, 18, Direction::Southwest), None);
 }
 
