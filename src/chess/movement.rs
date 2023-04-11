@@ -47,7 +47,6 @@ impl Move {
     }
 }
 
-/// Pawn movement, no capturing
 fn pawn_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
     match p.player {
         Player::White => {
@@ -271,12 +270,15 @@ fn queen_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
 }
 
 fn knight_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
-    if m.to < m.from { // Moving up
-        if m.from < ROW_LEN { return Err(anyhow!("Knights can only move in those weird L shapes!")); }
-        
-    }
+    let to = m.to as i32;
+    let from = m.from as i32;
+    let row_len = ROW_LEN as i32;
+    let board_len = BOARD_LEN as i32;
 
-    return Err(anyhow!("Not implemented yet!"));
+    if to == from - row_len - 2 || to == from - row_len + 2 || to == from + row_len - 2 || to == from + row_len + 2 ||
+       to == from - (row_len * 2) - 1 || to == from - (row_len * 2) + 1 || to == from + (row_len * 2) - 1 || to == from + (row_len * 2) + 1 { return Ok(()); }
+
+    return Err(anyhow!("Knights can only move in those weird 'L' shaped patterns!"));
 }
 
 enum Direction {
