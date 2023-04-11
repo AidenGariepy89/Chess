@@ -4,6 +4,7 @@ use anyhow::{Result, anyhow};
 impl Move {
     pub fn is_valid_move(&self, board: &Board) -> Result<()> {
         if self.from >= BOARD_LEN || self.to >= BOARD_LEN { return Err(anyhow!("Index out of bounds!")); }
+        if self.from == self.to { return Err(anyhow!("You have to actually move a piece!")); }
 
         match board.get_space(self.from).unwrap() {
             Piece::None => { return Err(anyhow!("No piece there!")); },
@@ -94,6 +95,24 @@ fn pawn_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
             return Err(anyhow!("Pawn can only move straight forward!"));
         },
     }
+}
+
+fn king_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
+    if m.to < m.from { // Moving up
+        if m.from < ROW_LEN {
+            if m.to == m.from - 1 { return Ok(()); }
+            else { return Err(anyhow!("The King can only move horizontally, vertically, and diagonally one space!")); }
+        }
+        if m.to == m.from - ROW_LEN || m.to == m.from - ROW_LEN - 1 || m.to == m.from - ROW_LEN + 1 { return Ok(()); }
+    } else { // Moving down
+        if m.from >= BOARD_LEN - ROW_LEN {
+            if m.to == m.from + 1 { return Ok(()); }
+            else { return Err(anyhow!("The King can only move horizontally, vertically, and diagonally one space!")); }
+        }
+        if m.to == m.from + ROW_LEN || m.to == m.from + ROW_LEN - 1 || m.to == m.from + ROW_LEN + 1 { return Ok(()); }
+    }
+
+    return Err(anyhow!("The King can only move horizontally, vertically, and diagonally one space!"));
 }
 
 fn rook_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
@@ -257,10 +276,6 @@ fn queen_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
     }
 
     return Err(anyhow!("The Queen can only move horizontally, vertically, or diagonally!"));
-}
-
-fn king_movement(board: &Board, m: &Move, p: PlayerPiece) -> Result<()> {
-    return Err(anyhow!("Not implemented yet!"));
 }
 
 enum Direction {
