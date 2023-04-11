@@ -26,10 +26,11 @@ pub enum Player {
 
 #[derive(Clone, Copy)]
 pub struct PlayerPiece {
-    piece: PieceType,
-    player: Player,
+    pub piece: PieceType,
+    pub player: Player,
 }
 
+#[derive(Clone, Copy)]
 pub struct Move {
     pub from: usize,
     pub to: usize,
@@ -38,10 +39,13 @@ pub struct Move {
 // Type Implementations
 
 impl Piece {
-    pub fn to_colored_string(&self) -> ColoredString {
+    pub fn to_colored_string(&self, is_last_move: bool, is_moved: bool) -> ColoredString {
         match self {
-            Piece::None => " ".normal(),
-            Piece::Piece(p) => p.to_colored_string(),
+            Piece::None => {
+                if is_last_move { return "#".truecolor(138, 138, 138); }
+                return " ".normal();
+            }
+            Piece::Piece(p) => p.to_colored_string(is_moved),
         }
     }
 }
@@ -51,29 +55,32 @@ impl PlayerPiece {
         Self { piece, player }
     }
 
-    pub fn to_colored_string(&self) -> ColoredString {
+    pub fn to_colored_string(&self, is_moved: bool) -> ColoredString {
+        let mut output = "".normal();
         match self.player {
             Player::White => {
                 match self.piece {
-                    PieceType::Pawn => "P".bold(),
-                    PieceType::Rook => "R".bold(),
-                    PieceType::Knight => "N".bold(),
-                    PieceType::Bishop => "B".bold(),
-                    PieceType::Queen => "Q".bold(),
-                    PieceType::King => "K".bold(),
+                    PieceType::Pawn => { output = "P".bold() },
+                    PieceType::Rook => { output = "R".bold() },
+                    PieceType::Knight => { output = "N".bold() },
+                    PieceType::Bishop => { output = "B".bold() },
+                    PieceType::Queen => { output = "Q".bold() },
+                    PieceType::King => { output = "K".bold() },
                 }
             },
             Player::Black => {
                 match self.piece {
-                    PieceType::Pawn => "P".green().bold(),
-                    PieceType::Rook => "R".green().bold(),
-                    PieceType::Knight => "N".green().bold(),
-                    PieceType::Bishop => "B".green().bold(),
-                    PieceType::Queen => "Q".green().bold(),
-                    PieceType::King => "K".green().bold(),
+                    PieceType::Pawn => { output = "P".green().bold() },
+                    PieceType::Rook => { output = "R".green().bold() },
+                    PieceType::Knight => { output = "N".green().bold() },
+                    PieceType::Bishop => { output = "B".green().bold() },
+                    PieceType::Queen => { output = "Q".green().bold() },
+                    PieceType::King => { output = "K".green().bold() },
                 }
             },
         }
+        if is_moved { output = output.on_truecolor(92, 91, 91); }
+        return output;
     }
 }
 
