@@ -10,8 +10,8 @@ impl Snapshot {
         Snapshot { spaces: board.get_spaces() }
     }
 
-    pub fn snap(board: &Board, m: &Move) -> Self {
-        let mut spaces = board.get_spaces();
+    pub fn snap(board: &[Piece; BOARD_LEN], m: &Move) -> Self {
+        let mut spaces = *board;
         spaces[m.to] = spaces[m.from];
         spaces[m.from] = Piece::None;
 

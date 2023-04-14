@@ -1,6 +1,6 @@
 use super::{
     keeper::Keeper,
-    utils::{Move, Piece, PieceType, Player, PlayerPiece},
+    utils::{Move, Piece, PieceType, Player, PlayerPiece}, checker::{Snapshot, is_in_check},
 };
 use anyhow::{anyhow, Result};
 use colored::*;
@@ -70,6 +70,11 @@ impl Board {
     pub fn play(&mut self, m: Move) -> Result<()> {
         m.is_valid_move(&self.spaces, self.turn)?;
 
+        let snap = Snapshot::snap(&self.spaces, &m);
+        if is_in_check(&snap, self.turn) {
+            return Err(anyhow!("That move would put you in check!"));
+        }
+
         let piece = self.spaces[m.from];
 
         self.spaces[m.from] = Piece::None;
@@ -129,11 +134,6 @@ impl Board {
                 self.turn = Player::White;
             }
         }
-    }
-
-    #[allow(dead_code)]
-    pub fn test(&self) {
-        println!("{:?}", self.keeper.get_black_pieces());
     }
 
     pub fn print(&self) {
