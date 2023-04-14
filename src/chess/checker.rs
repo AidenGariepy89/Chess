@@ -1,6 +1,4 @@
 use std::mem;
-
-use anyhow::{Result, anyhow};
 use super::{utils::{Piece, Player, Move, PieceType}, board::{BOARD_LEN, Board}, keeper::Keeper};
 
 pub struct Snapshot {
@@ -38,14 +36,16 @@ pub fn is_in_check(snap: &Snapshot, turn: Player) -> bool {
         }
     };
 
-    let opposing_pieces = match turn {
-        Player::White => { keeper.get_black_pieces() },
-        Player::Black => { keeper.get_white_pieces() },
+    let (opposing_pieces, opponent_turn) = match turn {
+        Player::White => { (keeper.get_black_pieces(), Player::Black) },
+        Player::Black => { (keeper.get_white_pieces(), Player::White) },
     };
 
     for piece in opposing_pieces {
         let m = Move { from: piece.1, to: king_position };
-        // m.is_valid_move(&snap.spaces, turn); WORKS NOW!!!
+        if m.is_valid_move(&snap.spaces, opponent_turn).is_ok() {
+            return true;
+        }
     }
 
     return false;
