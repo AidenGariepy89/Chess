@@ -68,7 +68,7 @@ impl Board {
     }
 
     pub fn play(&mut self, m: Move) -> Result<()> {
-        m.is_valid_move(&self)?;
+        m.is_valid_move(&self.spaces, self.turn)?;
 
         let piece = self.spaces[m.from];
 
@@ -117,6 +117,8 @@ impl Board {
     pub fn get_turn(&self) -> Player {
         self.turn
     }
+
+    pub fn get_keeper<'a>(&'a self) -> &'a Keeper { &self.keeper }
 
     pub fn next_turn(&mut self) {
         match self.turn {
