@@ -8,6 +8,7 @@ use anyhow::{Result, anyhow};
 use colored::*;
 use self::board::{Board, ROW_LEN};
 use self::utils::{Player, Move};
+use crate::chess::checker::Snapshot;
 use crate::input::get_input;
 
 pub enum LoopState {
@@ -19,6 +20,11 @@ pub fn run(board: &mut Board) -> LoopState {
     clearscr!();
 
     board.print();
+
+    let snap = Snapshot::new(&board);
+    if checker::is_in_check(&snap, board.get_turn()) {
+        println!("C H E C K !");
+    }
 
     match board.get_turn() {
         Player::White => println!("{}, make your move!", "White".bold()),
