@@ -1,10 +1,8 @@
 use super::{utils::{Move, Piece, PieceType, PlayerPiece, Player}, board::{BOARD_LEN, ROW_LEN}};
 use anyhow::{Result, anyhow};
 
-// TODO: Replace every &Board with a slice or Snapshot
-
 impl Move {
-    pub fn is_valid_move(&self, board: &[Piece], turn: Player) -> Result<()> {
+    pub fn is_valid_move(&self, board: &[Piece; BOARD_LEN], turn: Player) -> Result<()> {
         if self.from >= BOARD_LEN || self.to >= BOARD_LEN { return Err(anyhow!("Index out of bounds!")); }
         if self.from == self.to { return Err(anyhow!("You have to actually move a piece!")); }
 
