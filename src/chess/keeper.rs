@@ -1,6 +1,6 @@
 use std::mem;
 
-use super::{utils::{PieceType, Piece, Player}, board::Board};
+use super::utils::{PieceType, Piece, Player};
 
 const FULL_SET: [PieceType; 16] = [
     PieceType::Pawn, PieceType::Pawn,
