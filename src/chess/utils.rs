@@ -34,11 +34,40 @@ pub struct PlayerPiece {
 pub struct Move {
     pub from: usize,
     pub to: usize,
+    pub castle: Option<Castle>,
+}
+
+#[derive(Clone, Copy)]
+pub enum Castle {
+    Short,
+    Long,
 }
 
 // Type Implementations
 
+impl Move {
+    pub fn new(from: usize, to: usize) -> Self {
+        Self { from, to, castle: None }
+    }
+    pub fn castle(castle_long: bool) -> Self {
+        let castle = if castle_long { Castle::Long } else { Castle::Short };
+        Self { from: 0, to: 0, castle: Some(castle) }
+    }
+}
+
 impl Piece {
+    pub fn extract_value(&self) -> Option<PieceType> {
+        if let Piece::Piece(p) = self {
+            return Some(p.piece);
+        }
+        return None;
+    }
+    pub fn extract_player(&self) -> Option<Player> {
+        if let Piece::Piece(p) = self {
+            return Some(p.player);
+        }
+        return None;
+    }
     pub fn to_colored_string(&self, is_last_move: bool, is_moved: bool) -> ColoredString {
         match self {
             Piece::None => {
