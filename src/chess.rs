@@ -9,6 +9,7 @@ use colored::*;
 use self::board::{Board, ROW_LEN};
 use self::utils::{Player, Move};
 use crate::chess::checker::Snapshot;
+use crate::chess::movement::castle;
 use crate::input::get_input;
 
 pub enum LoopState {
@@ -46,14 +47,28 @@ pub fn run(board: &mut Board) -> LoopState {
             return LoopState::Continue;
         },
         Ok(m) => {
-            if let Err(error) = board.play(m) {
-                println!("{}", error);
+            match m.castle {
+                None => {
+                    if let Err(error) = board.play(m) {
+                        println!("{}", error);
 
-                #[allow(unused_variables)]
-                let input = get_input();
+                        #[allow(unused_variables)]
+                        let input = get_input();
 
-                return LoopState::Continue;
-            };
+                        return LoopState::Continue;
+                    };
+                },
+                Some(castle_options) => {
+                    if let Err(error) = castle(board, castle_options, board.get_turn()) {
+                        println!("{}", error);
+
+                        #[allow(unused_variables)]
+                        let input = get_input();
+
+                        return LoopState::Continue;
+                    }
+                }
+            }
         }
     }
 
@@ -83,9 +98,23 @@ fn interpret_notation(input: &str) -> Result<Move> {
 
             indices[i] = (row * ROW_LEN) + col;
         }
-        return Ok(Move { from: indices[0], to: indices[1] });
+        return Ok(Move::new(indices[0], indices[1]));
+    }
+
+    let mut it = args[0].chars();
+
+    if let Some(value) = it.next() {
+        match value {
+            '0' => {
+                let zeroes: Vec<_> = args[0].split('-').collect();
+                if zeroes.len() == 2 { return Ok(Move::castle(false)); }
+                if zeroes.len() == 3 { return Ok(Move::castle(true)); }
+                return Err(anyhow!("Invalid input!"));
+            },
+            _ => { return Err(anyhow!("Not implemented yet!")); }
+        }
     }
     
-    return Err(anyhow!("Not finished yet!"));
+    return Err(anyhow!("You can't input nothing!"));
 }
 

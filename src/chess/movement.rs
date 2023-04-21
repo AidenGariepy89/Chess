@@ -1,4 +1,4 @@
-use super::{utils::{Move, Piece, PieceType, PlayerPiece, Player}, board::{BOARD_LEN, ROW_LEN}};
+use super::{utils::{Move, Piece, PieceType, PlayerPiece, Player, Castle}, board::{BOARD_LEN, ROW_LEN, Board}};
 use anyhow::{Result, anyhow};
 
 impl Move {
@@ -47,7 +47,64 @@ impl Move {
     }
 }
 
+pub fn castle(board: &mut Board, options: Castle, turn: Player) -> Result<()> {
+    if board.get_keeper().can_castle(options, turn) {
+        match turn {
+            Player::Black => {
+                match options {
+                    Castle::Long => {
+                        let space1 = if let Some(Piece::None) = board.get_space(1) { true } else { false };
+                        let space2 = if let Some(Piece::None) = board.get_space(2) { true } else { false };
+                        let space3 = if let Some(Piece::None) = board.get_space(3) { true } else { false };
+                        if space1 && space2 && space3 {
+                            board.play_no_rules(Move::new(0, 3)).unwrap();
+                            board.play_no_rules(Move::new(4, 2)).unwrap();
+                            return Ok(());
+                        }
+                    },
+                    Castle::Short => {
+                        let space1 = if let Some(Piece::None) = board.get_space(5) { true } else { false };
+                        let space2 = if let Some(Piece::None) = board.get_space(6) { true } else { false };
+                        if space1 && space2 {
+                            board.play_no_rules(Move::new(7, 5)).unwrap();
+                            board.play_no_rules(Move::new(4, 6)).unwrap();
+                            return Ok(());
+                        }
+                    },
+                }
+            },
+            Player::White => {
+                match options {
+                    Castle::Long => {
+                        let space1 = if let Some(Piece::None) = board.get_space(57) { true } else { false };
+                        let space2 = if let Some(Piece::None) = board.get_space(58) { true } else { false };
+                        let space3 = if let Some(Piece::None) = board.get_space(59) { true } else { false };
+                        if space1 && space2 && space3 {
+                            board.play_no_rules(Move::new(56, 59)).unwrap();
+                            board.play_no_rules(Move::new(60, 58)).unwrap();
+                            return Ok(());
+                        }
+                    },
+                    Castle::Short => {
+                        let space1 = if let Some(Piece::None) = board.get_space(61) { true } else { false };
+                        let space2 = if let Some(Piece::None) = board.get_space(62) { true } else { false };
+                        if space1 && space2 {
+                            board.play_no_rules(Move::new(63, 61)).unwrap();
+                            board.play_no_rules(Move::new(60, 62)).unwrap();
+                            return Ok(());
+                        }
+                    },
+                }
+            },
+        }
+
+        return Err(anyhow!("There are pieces in the way!"));
+    }
+    return Err(anyhow!("Castling is currently not valid!"));
+}
+
 fn pawn_movement(board: &[Piece], m: &Move, p: PlayerPiece) -> Result<()> {
+    // MAKE IT SO THAT OVERFLOW CANT HAPPEN AAAAAAAAAAAAAAA
     match p.player {
         Player::White => {
             if m.to > m.from { return Err(anyhow!("Pawn cannot move backwards!")); }

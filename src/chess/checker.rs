@@ -42,7 +42,7 @@ pub fn is_in_check(snap: &Snapshot, turn: Player) -> bool {
     };
 
     for piece in opposing_pieces {
-        let m = Move { from: piece.1, to: king_position };
+        let m = Move::new(piece.1, king_position);
         if m.is_valid_move(&snap.spaces, opponent_turn).is_ok() {
             return true;
         }
