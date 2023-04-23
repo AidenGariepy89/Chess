@@ -87,6 +87,10 @@ impl Board {
         return Ok(());
     }
 
+    pub fn change_piece(&mut self, piece: usize, promote_to: Piece) {
+        self.spaces[piece] = promote_to; 
+    }
+
     pub fn play_no_rules(&mut self, m: Move) -> Result<()> {
         match self.spaces[m.from] {
             Piece::None => {

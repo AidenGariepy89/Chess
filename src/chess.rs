@@ -72,6 +72,38 @@ pub fn run(board: &mut Board) -> LoopState {
         }
     }
 
+    let snap = Snapshot::new(board);
+    let promotable_pawns = checker::pawns_to_promote(&snap);
+    if promotable_pawns.len() > 0 {
+        for pawn in promotable_pawns {
+            loop {
+                println!("Pawn at {} is able to be promoted! Choose your promotion: Q, B, N, R", pawn);
+                let input = get_input().to_lowercase();
+                let input = input.trim();
+                let player = board.get_space(pawn).unwrap().extract_player().unwrap();
+                match input {
+                    "q" => {
+                        board.change_piece(pawn, utils::Piece::Piece(utils::PlayerPiece { piece: utils::PieceType::Queen, player  }));
+                        break;
+                    },
+                    "b" => {
+                        board.change_piece(pawn, utils::Piece::Piece(utils::PlayerPiece { piece: utils::PieceType::Bishop, player  }));
+                        break;
+                    },
+                    "n" => {
+                        board.change_piece(pawn, utils::Piece::Piece(utils::PlayerPiece { piece: utils::PieceType::Knight, player  }));
+                        break;
+                    },
+                    "r" => {
+                        board.change_piece(pawn, utils::Piece::Piece(utils::PlayerPiece { piece: utils::PieceType::Rook, player  }));
+                        break;
+                    },
+                    _ => { },
+                }
+            }
+        }
+    }
+
     board.next_turn();
 
     return LoopState::Continue;

@@ -51,3 +51,18 @@ pub fn is_in_check(snap: &Snapshot, turn: Player) -> bool {
     return false;
 }
 
+pub fn pawns_to_promote(snap: &Snapshot) -> Vec<usize> {
+    let mut pawns = Vec::<usize>::new();
+    for i in 0..8 {
+        if let Some(PieceType::Pawn) = snap.spaces[i].extract_value() {
+            pawns.push(i);
+        }
+    }
+    for i in 56..64 {
+        if let Some(PieceType::Pawn) = snap.spaces[i].extract_value() {
+            pawns.push(i);
+        }
+    }
+    return pawns;
+}
+
