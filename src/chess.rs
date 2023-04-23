@@ -3,11 +3,11 @@ pub mod utils;
 pub mod movement;
 pub mod checker;
 pub mod keeper;
+pub mod interpret;
 
-use anyhow::{Result, anyhow};
 use colored::*;
-use self::board::{Board, ROW_LEN};
-use self::utils::{Player, Move};
+use self::board::Board;
+use self::utils::Player;
 use crate::chess::checker::Snapshot;
 use crate::chess::movement::castle;
 use crate::input::get_input;
@@ -37,7 +37,7 @@ pub fn run(board: &mut Board) -> LoopState {
 
     if input == "q" { return LoopState::Exit; }
 
-    match interpret_notation(input) {
+    match interpret::interpret_notation(input, board) {
         Err(error) => {
             println!("{} Press enter to continue...", error);
 
@@ -75,46 +75,5 @@ pub fn run(board: &mut Board) -> LoopState {
     board.next_turn();
 
     return LoopState::Continue;
-}
-
-fn interpret_notation(input: &str) -> Result<Move> {
-    let args: Vec<_> = input.split(" ").collect();
-
-    if args.len() > 1 {
-        let mut indices: [usize; 2] = [0; 2];
-        for i in 0..2 {
-            let mut it = args[i].chars();
-            let col = it.next().unwrap_or_else(|| 'z');
-            let row = it.next().unwrap_or_else(|| '9');
-
-            if col < 'a' { return Err(anyhow!("Invalid input!")); }
-            if row > '8' { return Err(anyhow!("Invalid input!")); }
-
-            let col = col as usize - 'a' as usize;
-            let row = '8' as usize - row as usize;
-
-            if col >= ROW_LEN { return Err(anyhow!("Index out of range!")); }
-            if row >= ROW_LEN { return Err(anyhow!("Index out of range!")); }
-
-            indices[i] = (row * ROW_LEN) + col;
-        }
-        return Ok(Move::new(indices[0], indices[1]));
-    }
-
-    let mut it = args[0].chars();
-
-    if let Some(value) = it.next() {
-        match value {
-            '0' => {
-                let zeroes: Vec<_> = args[0].split('-').collect();
-                if zeroes.len() == 2 { return Ok(Move::castle(false)); }
-                if zeroes.len() == 3 { return Ok(Move::castle(true)); }
-                return Err(anyhow!("Invalid input!"));
-            },
-            _ => { return Err(anyhow!("Not implemented yet!")); }
-        }
-    }
-    
-    return Err(anyhow!("You can't input nothing!"));
 }
 
