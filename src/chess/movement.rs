@@ -108,6 +108,7 @@ fn pawn_movement(board: &[Piece], m: &Move, p: PlayerPiece) -> Result<()> {
     match p.player {
         Player::White => {
             if m.to > m.from { return Err(anyhow!("Pawn cannot move backwards!")); }
+            if m.from < ROW_LEN { return Err(anyhow!("This message should never be read, if the pawn is on top row should be promoted")); }
 
             if let Piece::Piece(_) = board[m.to] {
                 if m.to == m.from - ROW_LEN + 1 || m.to == m.from - ROW_LEN - 1 {
