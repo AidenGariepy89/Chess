@@ -5,14 +5,14 @@ use anyhow::{anyhow, Result};
 use super::{utils::{Move, PieceType, Player}, board::{ROW_LEN, Board}};
 
 pub fn interpret_notation(input: &str, board: &Board) -> Result<Move> {
-    let args: Vec<_> = input.split(" ").collect();
+    let args: Vec<_> = input.split(' ').collect();
 
     if args.len() > 1 {
         let mut indices: [usize; 2] = [0; 2];
         for i in 0..2 {
             let mut it = args[i].chars();
-            let col = it.next().unwrap_or_else(|| 'z');
-            let row = it.next().unwrap_or_else(|| '9');
+            let col = it.next().unwrap_or('z');
+            let row = it.next().unwrap_or('9');
 
             if col < 'a' { return Err(anyhow!("Invalid input!")); }
             if row > '8' { return Err(anyhow!("Invalid input!")); }
@@ -44,7 +44,7 @@ pub fn interpret_notation(input: &str, board: &Board) -> Result<Move> {
         }
     }
     
-    return Err(anyhow!("You can't input nothing!"));
+    Err(anyhow!("You can't input nothing!"))
 }
 
 fn complex_interpretation(input: &str, board: &Board) -> Result<Move> {
@@ -52,8 +52,8 @@ fn complex_interpretation(input: &str, board: &Board) -> Result<Move> {
     let len = input.len();
 
     if len == 2 {
-        let col = it.next().unwrap_or_else(|| 'z');
-        let row = it.next().unwrap_or_else(|| '9');
+        let col = it.next().unwrap_or('z');
+        let row = it.next().unwrap_or('9');
         if col < 'a' { return Err(anyhow!("Invalid input!")); }
         if row > '8' { return Err(anyhow!("Invalid input!")); }
         let col = col as usize - 'a' as usize;
@@ -74,12 +74,15 @@ fn complex_interpretation(input: &str, board: &Board) -> Result<Move> {
             if acceptable_moves.len() > 1 {
                 return Err(anyhow!("Could not distinquish between pawns!"));
             }
-            if acceptable_moves.len() == 0 {
+            if acceptable_moves.is_empty() {
                 return Err(anyhow!("Invalid pawn move!"));
             }
             return Ok(acceptable_moves[0]);
         }
-        if pawns_found.len() == 0 { return Err(anyhow!("No pawns in that column!")); }
+        if pawns_found.is_empty() {
+            return Err(anyhow!("No pawns in that column!"));
+        }
+
         let turn = generate_pawn_move(pawns_found[0], target, board.get_turn());
         match turn {
             None => { return Err(anyhow!("Invalid pawn move!")); },
@@ -87,7 +90,7 @@ fn complex_interpretation(input: &str, board: &Board) -> Result<Move> {
         }
     }
 
-    return Err(anyhow!("Not implemented yet! [from complex_interpretation]"));
+    Err(anyhow!("Not implemented yet! [from complex_interpretation]"))
 }
 
 fn get_pawns_in_column(col: usize, board: &Board) -> Vec<usize> {
@@ -103,7 +106,8 @@ fn get_pawns_in_column(col: usize, board: &Board) -> Vec<usize> {
             }
         }
     }
-    return pawns_found;
+
+    pawns_found
 }
 
 // No capturing yet
@@ -111,7 +115,7 @@ fn generate_pawn_move(from: usize, to: usize, turn: Player) -> Option<Move> {
     match turn {
         Player::White => {
             if to >= from { return None; }
-            if from >= 48 && from < 56 { // Pawn in home row
+            if (48..56).contains(&from) { // Pawn in home row
                 if to == from - ROW_LEN || to == from - (ROW_LEN * 2) {
                     return Some(Move::new(from, to));
                 }
@@ -122,7 +126,7 @@ fn generate_pawn_move(from: usize, to: usize, turn: Player) -> Option<Move> {
         },
         Player::Black => {
             if to <= from { return None; }
-            if from >= 8 && from < 15 { // Pawn in home row
+            if (8..15).contains(&from) { // Pawn in home row
                 if to == from + ROW_LEN || to == from + (ROW_LEN * 2) {
                     return Some(Move::new(from, to));
                 }
@@ -132,6 +136,7 @@ fn generate_pawn_move(from: usize, to: usize, turn: Player) -> Option<Move> {
             }
         }
     }
-    return None;
+
+    None
 }
 

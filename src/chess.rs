@@ -22,7 +22,7 @@ pub fn run(board: &mut Board) -> LoopState {
 
     board.print();
 
-    let snap = Snapshot::new(&board);
+    let snap = Snapshot::new(board);
     if checker::is_in_check(&snap, board.get_turn()) {
         println!("C H E C K !");
     }
@@ -74,7 +74,7 @@ pub fn run(board: &mut Board) -> LoopState {
 
     let snap = Snapshot::new(board);
     let promotable_pawns = checker::pawns_to_promote(&snap);
-    if promotable_pawns.len() > 0 {
+    if !promotable_pawns.is_empty() {
         for pawn in promotable_pawns {
             loop {
                 println!("Pawn at {} is able to be promoted! Choose your promotion: Q, B, N, R", pawn);
@@ -106,6 +106,6 @@ pub fn run(board: &mut Board) -> LoopState {
 
     board.next_turn();
 
-    return LoopState::Continue;
+    LoopState::Continue
 }
 

@@ -7,7 +7,7 @@ impl Move {
         if self.from == self.to { return Err(anyhow!("You have to actually move a piece!")); }
 
         match board[self.from] {
-            Piece::None => { return Err(anyhow!("No piece there!")); },
+            Piece::None => { Err(anyhow!("No piece there!")) },
             Piece::Piece(piece) => {
                 if let Piece::Piece(target_piece) = board[self.to] {
                     if let (Player::White, Player::White) = (piece.player, target_piece.player) {
@@ -24,22 +24,22 @@ impl Move {
 
                 match piece.piece {
                     PieceType::Pawn => {
-                        return pawn_movement(board, &self, piece);
+                        pawn_movement(board, self, piece)
                     },
                     PieceType::Rook => {
-                        return rook_movement(board, &self);
+                        rook_movement(board, self)
                     },
                     PieceType::Knight => {
-                        return knight_movement(&self);
+                        knight_movement(self)
                     },
                     PieceType::Bishop => {
-                        return bishop_movement(board, &self);
+                        bishop_movement(board, self)
                     },
                     PieceType::Queen => {
-                        return queen_movement(board, &self);
+                        queen_movement(board, self)
                     },
                     PieceType::King => {
-                        return king_movement(&self);
+                        king_movement(self)
                     },
                 }
             },
@@ -53,9 +53,9 @@ pub fn castle(board: &mut Board, options: Castle, turn: Player) -> Result<()> {
             Player::Black => {
                 match options {
                     Castle::Long => {
-                        let space1 = if let Some(Piece::None) = board.get_space(1) { true } else { false };
-                        let space2 = if let Some(Piece::None) = board.get_space(2) { true } else { false };
-                        let space3 = if let Some(Piece::None) = board.get_space(3) { true } else { false };
+                        let space1 = matches!(board.get_space(1), Some(Piece::None));
+                        let space2 = matches!(board.get_space(2), Some(Piece::None));
+                        let space3 = matches!(board.get_space(3), Some(Piece::None));
                         if space1 && space2 && space3 {
                             board.play_no_rules(Move::new(0, 3)).unwrap();
                             board.play_no_rules(Move::new(4, 2)).unwrap();
@@ -63,8 +63,8 @@ pub fn castle(board: &mut Board, options: Castle, turn: Player) -> Result<()> {
                         }
                     },
                     Castle::Short => {
-                        let space1 = if let Some(Piece::None) = board.get_space(5) { true } else { false };
-                        let space2 = if let Some(Piece::None) = board.get_space(6) { true } else { false };
+                        let space1 = matches!(board.get_space(5), Some(Piece::None));
+                        let space2 = matches!(board.get_space(6), Some(Piece::None));
                         if space1 && space2 {
                             board.play_no_rules(Move::new(7, 5)).unwrap();
                             board.play_no_rules(Move::new(4, 6)).unwrap();
@@ -76,9 +76,9 @@ pub fn castle(board: &mut Board, options: Castle, turn: Player) -> Result<()> {
             Player::White => {
                 match options {
                     Castle::Long => {
-                        let space1 = if let Some(Piece::None) = board.get_space(57) { true } else { false };
-                        let space2 = if let Some(Piece::None) = board.get_space(58) { true } else { false };
-                        let space3 = if let Some(Piece::None) = board.get_space(59) { true } else { false };
+                        let space1 = matches!(board.get_space(57), Some(Piece::None));
+                        let space2 = matches!(board.get_space(58), Some(Piece::None));
+                        let space3 = matches!(board.get_space(59), Some(Piece::None));
                         if space1 && space2 && space3 {
                             board.play_no_rules(Move::new(56, 59)).unwrap();
                             board.play_no_rules(Move::new(60, 58)).unwrap();
@@ -86,8 +86,8 @@ pub fn castle(board: &mut Board, options: Castle, turn: Player) -> Result<()> {
                         }
                     },
                     Castle::Short => {
-                        let space1 = if let Some(Piece::None) = board.get_space(61) { true } else { false };
-                        let space2 = if let Some(Piece::None) = board.get_space(62) { true } else { false };
+                        let space1 = matches!(board.get_space(61), Some(Piece::None));
+                        let space2 = matches!(board.get_space(62), Some(Piece::None));
                         if space1 && space2 {
                             board.play_no_rules(Move::new(63, 61)).unwrap();
                             board.play_no_rules(Move::new(60, 62)).unwrap();
@@ -100,11 +100,11 @@ pub fn castle(board: &mut Board, options: Castle, turn: Player) -> Result<()> {
 
         return Err(anyhow!("There are pieces in the way!"));
     }
-    return Err(anyhow!("Castling is currently not valid!"));
+
+    Err(anyhow!("Castling is currently not valid!"))
 }
 
 fn pawn_movement(board: &[Piece], m: &Move, p: PlayerPiece) -> Result<()> {
-    // MAKE IT SO THAT OVERFLOW CANT HAPPEN AAAAAAAAAAAAAAA
     match p.player {
         Player::White => {
             if m.to > m.from { return Err(anyhow!("Pawn cannot move backwards!")); }
@@ -127,7 +127,7 @@ fn pawn_movement(board: &[Piece], m: &Move, p: PlayerPiece) -> Result<()> {
             if m.from - m.to == ROW_LEN {
                 return Ok(());
             }
-            return Err(anyhow!("Pawn can only move straight forward!"));
+            Err(anyhow!("Pawn can only move straight forward!"))
         },
         Player::Black => {
             if m.to < m.from { return Err(anyhow!("Pawn cannot move backwards!")); }
@@ -149,7 +149,7 @@ fn pawn_movement(board: &[Piece], m: &Move, p: PlayerPiece) -> Result<()> {
             if m.to - m.from == ROW_LEN {
                 return Ok(());
             }
-            return Err(anyhow!("Pawn can only move straight forward!"));
+            Err(anyhow!("Pawn can only move straight forward!"))
         },
     }
 }
@@ -165,12 +165,12 @@ fn king_movement(m: &Move) -> Result<()> {
         if m.to == m.from + ROW_LEN || m.to == m.from + ROW_LEN - 1 || m.to == m.from + ROW_LEN + 1 { return Ok(()); } // moving down
     }
 
-    return Err(anyhow!("The King can only move horizontally, vertically, and diagonally one space!"));
+    Err(anyhow!("The King can only move horizontally, vertically, and diagonally one space!"))
 }
 
 fn rook_movement(board: &[Piece], m: &Move) -> Result<()> {
     if index_in_raycast(m.from, Direction::North, m.to) {
-        match raycast(&board, m.from, Direction::North) {
+        match raycast(board, m.from, Direction::North) {
             None => { return Ok(()); },
             Some(index) => {
                 if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -179,7 +179,7 @@ fn rook_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
     if index_in_raycast(m.from, Direction::East, m.to) {
-        match raycast(&board, m.from, Direction::East) {
+        match raycast(board, m.from, Direction::East) {
             None => { return Ok(()); },
             Some(index) => {
                 if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -188,7 +188,7 @@ fn rook_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
     if index_in_raycast(m.from, Direction::South, m.to) {
-        match raycast(&board, m.from, Direction::South) {
+        match raycast(board, m.from, Direction::South) {
             None => { return Ok(()); },
             Some(index) => {
                 if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -197,7 +197,7 @@ fn rook_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
     if index_in_raycast(m.from, Direction::West, m.to) {
-        match raycast(&board, m.from, Direction::West) {
+        match raycast(board, m.from, Direction::West) {
             None => { return Ok(()); },
             Some(index) => {
                 if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -206,12 +206,12 @@ fn rook_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
 
-    return Err(anyhow!("Rooks only move horizontally or vertically!"));
+    Err(anyhow!("Rooks only move horizontally or vertically!"))
 }
 
 fn bishop_movement(board: &[Piece], m: &Move) -> Result<()> {
     if index_in_raycast(m.from, Direction::Northeast, m.to) {
-        match raycast(&board, m.from, Direction::Northeast) {
+        match raycast(board, m.from, Direction::Northeast) {
             None => { return Ok(()); },
             Some(index) => {
                 if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -220,7 +220,7 @@ fn bishop_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
     if index_in_raycast(m.from, Direction::Northwest, m.to) {
-        match raycast(&board, m.from, Direction::Northwest) {
+        match raycast(board, m.from, Direction::Northwest) {
             None => { return Ok(()); },
             Some(index) => {
                 if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -229,7 +229,7 @@ fn bishop_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
     if index_in_raycast(m.from, Direction::Southeast, m.to) {
-        match raycast(&board, m.from, Direction::Southeast) {
+        match raycast(board, m.from, Direction::Southeast) {
             None => { return Ok(()); },
             Some(index) => {
                 if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -238,7 +238,7 @@ fn bishop_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
     if index_in_raycast(m.from, Direction::Southwest, m.to) {
-        match raycast(&board, m.from, Direction::Southwest) {
+        match raycast(board, m.from, Direction::Southwest) {
             None => { return Ok(()); },
             Some(index) => {
                 if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -247,12 +247,12 @@ fn bishop_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
 
-    return Err(anyhow!("Bishops only move diagonally!"));
+    Err(anyhow!("Bishops only move diagonally!"))
 }
 
 fn queen_movement(board: &[Piece], m: &Move) -> Result<()> {
     if index_in_raycast(m.from, Direction::North, m.to) {
-        match raycast(&board, m.from, Direction::North) {
+        match raycast(board, m.from, Direction::North) {
             None => { return Ok(()); },
             Some(index) => {
                 if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -261,7 +261,7 @@ fn queen_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
     if index_in_raycast(m.from, Direction::East, m.to) {
-        match raycast(&board, m.from, Direction::East) {
+        match raycast(board, m.from, Direction::East) {
             None => { return Ok(()); },
             Some(index) => {
                 if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -270,7 +270,7 @@ fn queen_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
     if index_in_raycast(m.from, Direction::South, m.to) {
-        match raycast(&board, m.from, Direction::South) {
+        match raycast(board, m.from, Direction::South) {
             None => { return Ok(()); },
             Some(index) => {
                 if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -279,7 +279,7 @@ fn queen_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
     if index_in_raycast(m.from, Direction::West, m.to) {
-        match raycast(&board, m.from, Direction::West) {
+        match raycast(board, m.from, Direction::West) {
             None => { return Ok(()); },
             Some(index) => {
                 if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -288,7 +288,7 @@ fn queen_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
     if index_in_raycast(m.from, Direction::Northeast, m.to) {
-        match raycast(&board, m.from, Direction::Northeast) {
+        match raycast(board, m.from, Direction::Northeast) {
             None => { return Ok(()); },
             Some(index) => {
                 if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -297,7 +297,7 @@ fn queen_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
     if index_in_raycast(m.from, Direction::Northwest, m.to) {
-        match raycast(&board, m.from, Direction::Northwest) {
+        match raycast(board, m.from, Direction::Northwest) {
             None => { return Ok(()); },
             Some(index) => {
                 if index > m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -306,7 +306,7 @@ fn queen_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
     if index_in_raycast(m.from, Direction::Southeast, m.to) {
-        match raycast(&board, m.from, Direction::Southeast) {
+        match raycast(board, m.from, Direction::Southeast) {
             None => { return Ok(()); },
             Some(index) => {
                 if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -315,7 +315,7 @@ fn queen_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
     if index_in_raycast(m.from, Direction::Southwest, m.to) {
-        match raycast(&board, m.from, Direction::Southwest) {
+        match raycast(board, m.from, Direction::Southwest) {
             None => { return Ok(()); },
             Some(index) => {
                 if index < m.to { return Err(anyhow!("There is a piece in the way!")); }
@@ -324,7 +324,7 @@ fn queen_movement(board: &[Piece], m: &Move) -> Result<()> {
         }
     }
 
-    return Err(anyhow!("The Queen can only move horizontally, vertically, or diagonally!"));
+    Err(anyhow!("The Queen can only move horizontally, vertically, or diagonally!"))
 }
 
 fn knight_movement(m: &Move) -> Result<()> {
@@ -335,7 +335,7 @@ fn knight_movement(m: &Move) -> Result<()> {
     if to == from - row_len - 2 || to == from - row_len + 2 || to == from + row_len - 2 || to == from + row_len + 2 ||
        to == from - (row_len * 2) - 1 || to == from - (row_len * 2) + 1 || to == from + (row_len * 2) - 1 || to == from + (row_len * 2) + 1 { return Ok(()); }
 
-    return Err(anyhow!("Knights can only move in those weird 'L' shaped patterns!"));
+    Err(anyhow!("Knights can only move in those weird 'L' shaped patterns!"))
 }
 
 enum Direction {
@@ -417,7 +417,7 @@ fn index_in_raycast(from: usize, direction: Direction, needle: usize) -> bool {
         }
     }
 
-    return false;
+    false
 }
 
 fn raycast(board: &[Piece], from: usize, direction: Direction) -> Option<usize> {
@@ -504,6 +504,6 @@ fn raycast(board: &[Piece], from: usize, direction: Direction) -> Option<usize> 
         }
     }
 
-    return None;
+    None
 }
 

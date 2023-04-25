@@ -60,19 +60,20 @@ impl Piece {
         if let Piece::Piece(p) = self {
             return Some(p.piece);
         }
-        return None;
+        None
     }
     pub fn extract_player(&self) -> Option<Player> {
         if let Piece::Piece(p) = self {
             return Some(p.player);
         }
-        return None;
+        None
     }
     pub fn to_colored_string(&self, is_last_move: bool, is_moved: bool) -> ColoredString {
         match self {
             Piece::None => {
                 if is_last_move { return "#".truecolor(138, 138, 138); }
-                return " ".normal();
+
+                " ".normal()
             }
             Piece::Piece(p) => p.to_colored_string(is_moved),
         }
@@ -109,8 +110,11 @@ impl PlayerPiece {
                 }
             },
         }
-        if is_moved { output = output.on_truecolor(92, 91, 91); }
-        return output;
+        if is_moved {
+            output = output.on_truecolor(92, 91, 91);
+        }
+
+        output
     }
 }
 
