@@ -15,7 +15,7 @@ impl Snapshot {
         spaces[m.to] = spaces[m.from];
         spaces[m.from] = Piece::None;
 
-        return Snapshot { spaces };
+        Snapshot { spaces }
     }
 }
 
@@ -48,7 +48,7 @@ pub fn is_in_check(snap: &Snapshot, turn: Player) -> bool {
         }
     }
 
-    return false;
+    false
 }
 
 pub fn pawns_to_promote(snap: &Snapshot) -> Vec<usize> {
@@ -63,6 +63,7 @@ pub fn pawns_to_promote(snap: &Snapshot) -> Vec<usize> {
             pawns.push(i);
         }
     }
-    return pawns;
+
+    pawns
 }
 

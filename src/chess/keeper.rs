@@ -37,8 +37,8 @@ impl Keeper {
         let mut white_pieces: Vec<(PieceType, usize)> = Vec::new();
         let mut black_pieces: Vec<(PieceType, usize)> = Vec::new();
 
-        for i in 0..spaces.len() {
-            if let Piece::Piece(p) = spaces[i] {
+        for (i, piece) in spaces.iter().enumerate() {
+            if let Piece::Piece(p) = piece {
                 match p.player {
                     Player::White => { white_pieces.push((p.piece, i)); },
                     Player::Black => { black_pieces.push((p.piece, i)); }
@@ -46,20 +46,20 @@ impl Keeper {
             }
         }
 
-        return Self {
+        Self {
             white_pieces,
             black_pieces,
             white_castling: CastleState::Able(CastleSide::Both),
             black_castling: CastleState::Able(CastleSide::Both),
-        };
+        }
     }
 
     pub fn update(&mut self, spaces: &[Piece]) {
         let mut white_pieces: Vec<(PieceType, usize)> = Vec::new();
         let mut black_pieces: Vec<(PieceType, usize)> = Vec::new();
 
-        for i in 0..spaces.len() {
-            if let Piece::Piece(p) = spaces[i] {
+        for (i, piece) in spaces.iter().enumerate() {
+            if let Piece::Piece(p) = piece {
                 match p.player {
                     Player::White => { white_pieces.push((p.piece, i)); },
                     Player::Black => { black_pieces.push((p.piece, i)); }
@@ -80,7 +80,7 @@ impl Keeper {
                 pieces.remove(index);
             }
         }
-        return pieces;
+        pieces
     }
 
     pub fn get_white_captured(&self) -> Vec<PieceType> {
@@ -90,7 +90,7 @@ impl Keeper {
                 pieces.remove(index);
             }
         }
-        return pieces;
+        pieces
     }
 
     pub fn get_black_pieces(&self) -> Vec<(PieceType, usize)> { self.black_pieces.clone() }
@@ -136,7 +136,7 @@ impl Keeper {
                 }
             },
         }
-        return true;
+        true
     }
 }
 
@@ -211,6 +211,6 @@ fn determine_castling_state(previous_state: (CastleState, CastleState), current:
         white_state = CastleState::Able(CastleSide::Both);
     }
 
-    return (white_state, black_state);
+    (white_state, black_state)
 }
 

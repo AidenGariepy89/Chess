@@ -15,6 +15,12 @@ pub struct Board {
     keeper: Keeper,
 }
 
+impl Default for Board {
+    fn default() -> Self {
+        Board::new()
+    }
+}
+
 impl Board {
     pub fn new() -> Self {
         let spaces = [
@@ -59,12 +65,12 @@ impl Board {
             Piece::Piece(PlayerPiece::new(PieceType::Rook, Player::White)),
         ];
 
-        return Self {
+        Self {
             turn: Player::White,
             last_move: None,
             keeper: Keeper::new(&spaces),
             spaces,
-        };
+        }
     }
 
     pub fn play(&mut self, m: Move) -> Result<()> {
@@ -84,7 +90,7 @@ impl Board {
 
         self.keeper.update(&self.spaces);
 
-        return Ok(());
+        Ok(())
     }
 
     pub fn change_piece(&mut self, piece: usize, promote_to: Piece) {
@@ -109,25 +115,25 @@ impl Board {
             }
         }
 
-        return Ok(());
+        Ok(())
     }
 
     pub fn get_space(&self, index: usize) -> Option<Piece> {
         if index >= BOARD_LEN {
             return None;
         }
-        return Some(self.spaces[index]);
+        Some(self.spaces[index])
     }
 
     pub fn get_spaces(&self) -> [Piece; BOARD_LEN] {
-        return self.spaces;
+        self.spaces
     }
 
     pub fn get_turn(&self) -> Player {
         self.turn
     }
 
-    pub fn get_keeper<'a>(&'a self) -> &'a Keeper { &self.keeper }
+    pub fn get_keeper(&self) -> &Keeper { &self.keeper }
 
     pub fn next_turn(&mut self) {
         match self.turn {
