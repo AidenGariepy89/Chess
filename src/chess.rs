@@ -57,7 +57,7 @@ pub fn run(board: &mut Board) -> LoopState {
 
                         return LoopState::Continue;
                     };
-                },
+                }
                 Some(castle_options) => {
                     if let Err(error) = castle(board, castle_options, board.get_turn()) {
                         println!("{}", error);
@@ -85,20 +85,20 @@ pub fn run(board: &mut Board) -> LoopState {
                     "q" => {
                         board.change_piece(pawn, utils::Piece::Piece(utils::PlayerPiece { piece: utils::PieceType::Queen, player  }));
                         break;
-                    },
+                    }
                     "b" => {
                         board.change_piece(pawn, utils::Piece::Piece(utils::PlayerPiece { piece: utils::PieceType::Bishop, player  }));
                         break;
-                    },
+                    }
                     "n" => {
                         board.change_piece(pawn, utils::Piece::Piece(utils::PlayerPiece { piece: utils::PieceType::Knight, player  }));
                         break;
-                    },
+                    }
                     "r" => {
                         board.change_piece(pawn, utils::Piece::Piece(utils::PlayerPiece { piece: utils::PieceType::Rook, player  }));
                         break;
-                    },
-                    _ => { },
+                    }
+                    _ => { }
                 }
             }
         }
